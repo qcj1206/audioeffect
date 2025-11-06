@@ -13,7 +13,6 @@ def Coefficients(hz: float, slope: float, gain: float, samplerate: float,
                  a0: float, a1: float, a2: float,
                  b0: float, b1: float, b2: float):
     """
-    与 C 代码逐字符等价，返回 (b0,b1,b2,a0,a1,a2) 且 **已除以 a0**
     type_  : 0=kBass  1=kTreble
     """
     w = 2.0 * M_PI * hz / samplerate
