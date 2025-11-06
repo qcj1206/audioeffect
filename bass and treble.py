@@ -178,16 +178,6 @@ files = os.listdir("./data/")
 for file in files:
     data,fs = sf.read(filepath + file)
 
-    #实时动态范围算法配置
-    numSamples = 1024#int(fr.frequency / 25)
-    delayInSamples = int(0.005 * fs)
-    delayInBufferSize = numSamples + delayInSamples
-    delayBuffer = np.zeros((delayInBufferSize, 2))
-    delaywritePosition = 0
-    LookAheadBuffer = np.zeros((delayInBufferSize, 2))
-    LookAheadwritePostion = 0
-    data_gs_buffer = np.zeros(2)
-
     block_size = 1024
 
 
@@ -195,15 +185,15 @@ for file in files:
     state2 = BassTrebleState()
     InstanceInit(state1, fs, 0.0, 0.0, 0.0)     # 初始清零
     InstanceInit(state2, fs, 0.0, 0.0, 0.0)     # 初始清零
-    for i in range(int(data.shape[0] / 1024)):
+    for i in range(int(data.shape[0] / block_size)):
         #真正处理
         # ① 先测“原始”响度（还没 EQ）
 
-        data_l = data[i * 1024:(i + 1) * 1024, 0]
-        data_r = data[i * 1024:(i + 1) * 1024, 1]
+        data_l = data[i * block_size:(i + 1) * block_size, 0]
+        data_r = data[i * block_size:(i + 1) * block_size, 1]
 
-        data[i * 1024:(i+1)*1024, 0] = InstanceProcess(state1,  15, 0.0, 0.0, data_l)  # +15 dB bass, +0 dB treble
-        data[i * 1024:(i+1)*1024, 1] = InstanceProcess(state2,  15, 0.0, 0.0, data_r)  # +15 dB bass, +0 dB treble
+        data[i * block_size:(i+1)*block_size, 0] = InstanceProcess(state1,  15, 0.0, 0.0, data_l)  # +15 dB bass, +0 dB treble
+        data[i * block_size:(i+1)*block_size, 1] = InstanceProcess(state2,  15, 0.0, 0.0, data_r)  # +15 dB bass, +0 dB treble
 
     data = np.clip(data,-1,1)
     #soft = SoftClip(drive_db=-0.1)
